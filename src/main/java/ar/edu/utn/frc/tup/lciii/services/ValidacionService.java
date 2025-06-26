@@ -16,9 +16,19 @@ public class ValidacionService {
      * Lanza IllegalArgumentException si algún parámetro es inválido.
      */
     public void validarParametros(Long idHotel, String tipoHabitacion, Date fechaIngreso, Date fechaSalida, String medioPago) {
-        // TODO: Implementar la lógica para validar los parámetros
+        // --TODO-- done: Implementar la lógica para validar los parámetros
+        if (idHotel == null || !IDS_HOTEL.contains(idHotel)) {
+            throw new IllegalArgumentException("id hotel inválido");
+        }
+        if (tipoHabitacion == null || !TIPOS_HABITACION.contains(tipoHabitacion.toUpperCase())) {
+            throw new IllegalArgumentException("Tipo habitación inválido");
+        }
+        if (fechaIngreso == null || fechaSalida == null || fechaIngreso.after(fechaSalida) || fechaIngreso.before(new Date())) {
+            throw new IllegalArgumentException("Fechas inválidas");
+        }
+        if (medioPago == null || !MEDIOS_PAGO.contains(medioPago.toUpperCase())) {
+            throw new IllegalArgumentException("Medio de pago inválido");
+        }
         return;
-
-        
     }
 } 

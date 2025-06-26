@@ -27,8 +27,17 @@ public class ReservaController {
      *         Si no existe, retorna un objeto ErrorApi con mensaje de error y status 404 Not Found.
      */
     public ResponseEntity<?> getReserva(@PathVariable("id_reserva") Long idReserva) {
-       // TODO: Implementar la lógica para obtener la reserva
-       return null;
+       // TODO --done: Implementar la lógica para obtener la reserva
+        ReservaDTO reserva = reservaService.buscarReserva(idReserva);
+        if (reserva != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(reserva);
+        } else {
+            ErrorApi error = new ErrorApi();
+            error.setStatus(404);
+            error.setError("Not Found");
+            error.setMessage("Reserva no encontrada");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        }
     }
 
     @PostMapping("/reserva")
@@ -39,8 +48,17 @@ public class ReservaController {
      *         Si hay un error de validación, retorna un objeto ErrorApi con mensaje de error y status 400 Bad Request.
      */
     public ResponseEntity<?> crearReserva(@RequestBody ReservaCreateDTO reservaCreateDTO) {
-        // TODO: Implementar la lógica para crear la reserva
-        return null;
+        // TODO --done: Implementar la lógica para crear la reserva
+        try {
+            ReservaDTO reserva = reservaService.crearReserva(reservaCreateDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(reserva);
+        } catch (IllegalArgumentException e) {
+            ErrorApi error = new ErrorApi();
+            error.setStatus(400);
+            error.setError("Bad Request");
+            error.setMessage(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
     }
 
 }

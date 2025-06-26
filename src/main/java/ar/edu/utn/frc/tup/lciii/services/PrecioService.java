@@ -32,8 +32,13 @@ public class PrecioService {
      * Aplica el mayor factor de temporada del rango y el descuento correspondiente.
      */
     public BigDecimal calcularPrecio(Long idHotel, String tipoHabitacion, Date fechaIngreso, Date fechaSalida, String medioPago) {
-        // TODO: Implementar la lógica para calcular el precio de la reserva
-        return null;
+        // TODO-- done : Implementar la lógica para calcular el precio de la reserva
+        Double precioBase = PRECIOS_BASE.get(idHotel).get(tipoHabitacion);
+        long dias = (fechaSalida.getTime() - fechaIngreso.getTime()) / (24 * 60 * 60 * 1000);
+        double factorTemporada = getFactorTemporada(fechaIngreso, fechaSalida);
+        double precioTotal = precioBase * dias * factorTemporada;
+        double precioFinal = aplicarDescuento(precioTotal, medioPago);
+        return BigDecimal.valueOf(precioFinal);
     }
 
     /**
@@ -71,7 +76,14 @@ public class PrecioService {
      * Aplica el descuento correspondiente según el medio de pago.
      */
     private double aplicarDescuento(double precio, String medioPago) {
-        // TODO: Implementar la lógica para aplicar el descuento según el medio de pago
-        return 0.0;
+        // TODO-- done: Implementar la lógica para aplicar el descuento según el medio de pago
+        if (medioPago.equals("EFECTIVO")){
+            return precio * 0.75;
+        } else if (medioPago.equals("TARJETA_DEBITO")) {
+            return precio * 0.9;
+        } else if (medioPago.equals("TARJETA_CREDITO")) {
+            return precio;
+        }
+        else {return precio;}
     }
 } 

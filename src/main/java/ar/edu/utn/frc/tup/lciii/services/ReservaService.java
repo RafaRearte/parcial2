@@ -8,6 +8,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 @Service
@@ -30,20 +31,44 @@ public class ReservaService {
      * @throws IllegalArgumentException si alguna validación falla
      */
     public ReservaDTO crearReserva(ReservaCreateDTO reservaCreateDTO) {
-        // TODO: Implementar la lógica para crear la reserva
+        // TODO-- done: Implementar la lógica para crear la reserva
         
         // Aquí deberás mapear manualmente o usando un mapper de ReservaCreateDTO a ReservaDTO o a la entidad correspondiente
         // Validar parámetros de entrada
-
+        validacionService.validarParametros(
+                reservaCreateDTO.getIdHotel(),
+                reservaCreateDTO.getTipoHabitacion(),
+                reservaCreateDTO.getFechaIngreso(),
+                reservaCreateDTO.getFechaSalida(),
+                reservaCreateDTO.getMedioPago()
+        );
         // Verificar disponibilidad
-
+        if (!disponibilidadService.hayDisponibilidad(
+                reservaCreateDTO.getIdHotel(),
+                reservaCreateDTO.getTipoHabitacion(),
+                reservaCreateDTO.getFechaIngreso(),
+                reservaCreateDTO.getFechaSalida())) {
+            throw new IllegalArgumentException("No hay disponibilidad");
+        }
         // Calcular precio
-
+        BigDecimal precioTotal = precioService.calcularPrecio(
+                reservaCreateDTO.getIdHotel(),
+                reservaCreateDTO.getTipoHabitacion(),
+                reservaCreateDTO.getFechaIngreso(),
+                reservaCreateDTO.getFechaSalida(),
+                reservaCreateDTO.getMedioPago()
+        );
         // Mapear DTO a entidad y persistir
+        Reserva reserva = modelMapper.map(reservaCreateDTO, Reserva.class);
+        reserva.setPrecio(precioTotal);
+        reserva.setEstadoReserva("EXITOSA");
+        Reserva reservaGuardada = reservaRepository.save(reserva);
+
 
         // Mapear entidad persistida a DTO de respuesta
 
-        return null;
+
+        return modelMapper.map(reservaGuardada, ReservaDTO.class);
     }
 
     /**
@@ -53,7 +78,12 @@ public class ReservaService {
      * @throws IllegalArgumentException si no se encuentra la reserva
      */
     public ReservaDTO buscarReserva(Long idReserva) {
-        // TODO: Implementar la lógica para buscar la reserva
+        // TODO -- done: Implementar la lógica para buscar la reserva
+        Optional<Reserva> reservaOptional = reservaRepository.findById(idReserva);
+        if (reservaOptional.isPresent()) {
+            Reserva reserva = reservaOptional.get();
+            return modelMapper.map(reserva, ReservaDTO.class);
+        }
         return null;
     }
 } 
